@@ -161,14 +161,18 @@ module Dependabot
 
         def missing_poetry_keys
           package_mode = poetry_root.fetch("package-mode", true)
-          required_keys = package_mode ? %w(name version description authors) : []
-          required_keys.reject { |key| poetry_root.key?(key) }
+          required_keys = package_mode ? %w(name version) : []
+          required_keys.reject { |key| poetry_root.key?(key) || project_root.key?(key) }
         end
 
         def using_pep621?
           !parsed_pyproject.dig("project", "dependencies").nil? ||
             !parsed_pyproject.dig("project", "optional-dependencies").nil? ||
             !parsed_pyproject.dig("build-system", "requires").nil?
+        end
+
+        def project_root
+          parsed_pyproject["project"]
         end
 
         def poetry_root

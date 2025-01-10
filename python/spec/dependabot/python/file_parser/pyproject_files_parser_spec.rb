@@ -276,6 +276,41 @@ RSpec.describe Dependabot::Python::FileParser::PyprojectFilesParser do
     end
   end
 
+  describe "parse pep621 files with dynamic dependencies" do
+    subject(:dependency_names) { dependencies.map(&:name) }
+
+    let(:dependencies) { parser.dependency_set.dependencies }
+
+    context "with dynamic dependencies" do
+      let(:pyproject_fixture_name) { "poetry_dynamic_pep621.toml" }
+
+      it "includes main dependencies" do
+        expect(dependency_names).to include("requests")
+      end
+    end
+  end
+
+  describe "parse integro poetry file" do
+    subject(:dependencies) { parser.dependency_set.dependencies }
+
+    let(:pyproject_fixture_name) { "integro.toml" }
+
+    context "with integro toml" do
+      subject(:dependency_names) { dependencies.map(&:name) }
+
+      it "includes main dependencies" do
+        expect(dependency_names).to include("integro-types")
+      end
+
+      it "includes other group dependencies" do
+        expect(dependency_names).to include("ruff")
+        expect(dependency_names).to include("constructs")
+        expect(dependency_names).to include("pytest")
+        expect(dependency_names).to include("types-requests")
+      end
+    end
+  end
+
   describe "parse standard python files" do
     subject(:dependencies) { parser.dependency_set.dependencies }
 
